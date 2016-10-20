@@ -13,15 +13,13 @@ import akka.util.Timeout
 
 import scala.concurrent.Future
 
-import cathode.reflect.HoleClassTag
-
 /** Companion for [[AskFunctionK]]
   *
   * @author Andy Scott
   */
 object AskFunctionK {
 
-  def apply[F[_]: HoleClassTag](
+  def apply[F[_]](
     peer: ActorRef,
     timeout: Timeout
   ): AskFunctionK[F] = new AskFunctionK(peer, timeout)
@@ -32,12 +30,13 @@ object AskFunctionK {
   *
   * @author Andy Scott
   */
-class AskFunctionK[F[_]](peer: ActorRef, timeout: Timeout)(
-    implicit
-    hole: HoleClassTag[F]
-) extends (F ~> Future) {
+class AskFunctionK[F[_]](peer: ActorRef, timeout: Timeout) extends (F ~> Future) {
+
+  import scala.reflect._
+
+  private[this] val cta = classTag[Any]
 
   override def apply[A](fa: F[A]): Future[A] =
-    peer.ask(fa)(timeout).mapTo[A](hole.classTagA(fa))
+    peer.ask(fa)(timeout).mapTo[A](cta.asInstanceOf[ClassTag[A]])
 
 }
