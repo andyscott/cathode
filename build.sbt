@@ -11,12 +11,20 @@ lazy val root = (project in file("."))
   .aggregate(
   `tests`,
   `cathode-core`,
+  `cathode-free`,
   `cathode-monix`)
 
 lazy val `cathode-core` = (project in file("cathode-core"))
   .settings(name := "cathode-core")
   .settings(libraryDependencies ++= Seq(
     "org.typelevel"     %% "cats-core"      % catsVersion,
+    "com.typesafe.akka" %% "akka-actor"     % akkaVersion
+  ))
+
+lazy val `cathode-free` = (project in file("cathode-free"))
+  .settings(name := "cathode-free")
+  .dependsOn(`cathode-core`)
+  .settings(libraryDependencies ++= Seq(
     "org.typelevel"     %% "cats-free"      % catsVersion,
     "com.typesafe.akka" %% "akka-actor"     % akkaVersion
   ))
@@ -28,10 +36,10 @@ lazy val `cathode-monix` = (project in file("cathode-monix"))
     "io.monix"          %% "monix-eval"     % monixVersion
   ))
 
-
 lazy val `tests` = (project in file("tests"))
   .settings(name := "tests")
   .dependsOn(`cathode-core`)
+  .dependsOn(`cathode-free`)
   .dependsOn(`cathode-monix`)
   .settings(libraryDependencies ++= Seq(
     "org.scalacheck"    %% "scalacheck"     % scalacheckVersion,

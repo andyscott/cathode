@@ -18,11 +18,10 @@ import scala.concurrent.Future
   * @author Andy Scott
   */
 object AskFunctionK {
-
   def apply[F[_]](
     peer: ActorRef,
     timeout: Timeout
-  ): AskFunctionK[F] = new AskFunctionK(peer, timeout)
+  )(implicit ev: F[_] =:!= Nothing): AskFunctionK[F] = new AskFunctionK(peer, timeout)
 }
 
 /** A natural transformation from `F` to `Future`, backed by asking
