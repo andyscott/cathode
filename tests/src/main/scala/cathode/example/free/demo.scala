@@ -82,28 +82,26 @@ object FreerunDemo {
 
     val program = for {
       _ ← io.println("Hello!")
-      key1 = "key1"
-      value1 = "value1"
+      key1 ← io.readln("What key?")
+      value1 ← io.readln("What value?")
       _ ← storage.set(key1, value1)
       res1 ← storage.get(key1)
-      res2 ← storage.get("meh")
-      _ ← io.println("res1 -> " + res1)
-      _ ← io.println("res2 -> " + res2)
+      key2 ← io.readln("What key, again?")
+      res2 ← storage.get(key2).map(_ getOrElse "<<nada>>")
+      _ ← io.println(s"you looked up $res2")
+      _ ← io.println("thanks for playing")
 
-    } yield (res1, res2)
+    } yield res2
 
     val system = ActorSystem("cathode")
 
     val storageRef: ActorRef = system.actorOf(StorageActor.props)
     val interpreter = IOOp.interpreter or AskFunctionK[StorageActor.Op](storageRef, 10.seconds)
 
-    val runner = system.actorOf(FreeRunActor.props[Program](interpreter))
-    val freeRun = AskFunctionK[Free[Program, ?]](runner, 1.seconds)
+    val res0 = FreeRun[Program](system, 100.seconds, program, interpreter)
+    val res1 = Await.result(res0, Duration.Inf)
 
-    val future = freeRun(program)
-    val res = Await.result(future, 1.seconds)
-
-    println("Result is " + res)
+    println("Result is " + res1)
 
     val terminate = system.terminate()
   }

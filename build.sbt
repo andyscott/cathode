@@ -6,6 +6,7 @@ lazy val scalatestVersion     = "3.0.0"
 lazy val scalacheckVersion    = "1.13.2"
 lazy val disciplineVersion    = "0.4"
 lazy val catsScalatestVersion = "1.4.0"
+lazy val gatlingVersion       = "2.2.2"
 
 lazy val root = (project in file("."))
   .aggregate(
@@ -46,3 +47,8 @@ lazy val `tests` = (project in file("tests"))
     "org.scalatest"     %% "scalatest"      % scalatestVersion,
     "com.typesafe.akka" %% "akka-testkit"   % akkaVersion
   ).map(_ % "test"))
+  .enablePlugins(GatlingPlugin)
+  .settings(libraryDependencies ++= Seq(
+    "io.gatling.highcharts" % "gatling-charts-highcharts" % gatlingVersion,
+    "io.gatling"            % "gatling-test-framework"    % gatlingVersion
+  ).map(_ % "it"))
