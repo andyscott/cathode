@@ -39,9 +39,14 @@ class FunctionKActor[F[_], G[_]](interp: F ~> G, send: FunctionKActor.Send[G])(
   * @author Andy Scott
   */
 object FunctionKActor {
+
+  def props[F[_], G[_]: Send](f: F ~> G)(implicit evF: ClassTag[F[_]]): Props =
+    Props(new FunctionKActor(f))
+
   trait Send[F[_]] {
     def send[A](ref: ActorRef, msg: F[A]): Unit
   }
+
   object Send extends LowPrioritySendInstances {
     def apply[F[_]](implicit ev: Send[F]): Send[F] = ev
 

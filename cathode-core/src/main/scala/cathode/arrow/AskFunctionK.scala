@@ -30,12 +30,9 @@ object AskFunctionK {
   * @author Andy Scott
   */
 class AskFunctionK[F[_]](peer: ActorRef, timeout: Timeout) extends (F ~> Future) {
-
-  import scala.reflect._
-
-  private[this] val cta = classTag[Any]
+  import scala.concurrent.`cathode-internal`.FutureHelper._
 
   override def apply[A](fa: F[A]): Future[A] =
-    peer.ask(fa)(timeout).mapTo[A](cta.asInstanceOf[ClassTag[A]])
+    peer.ask(fa)(timeout).map(_.asInstanceOf[A])(InternalCallbackExecutor)
 
 }

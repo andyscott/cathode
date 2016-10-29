@@ -11,8 +11,8 @@ import cats.free._
 import akka.actor._
 import scala.concurrent.Future
 
-object FreeRunActor {
-  def props[S[_]](interp: S ~> Future): Props = Props(classOf[FreeRunActor], interp)
+object SimpleFreeRunActor {
+  def props[S[_]](interp: S ~> Future): Props = Props(classOf[SimpleFreeRunActor], interp)
 }
 
 /** An actor to evaluate `Free` monads.
@@ -24,7 +24,7 @@ object FreeRunActor {
   * TODO: Add support for timing out
   *
   */
-final class FreeRunActor(interp: Id ~> Future) extends Actor {
+final class SimpleFreeRunActor(interp: Id ~> Future) extends Actor {
   import `cathode-internal`.FreeInternal.{ Pure, Suspend, FlatMapped }
   import context.dispatcher
 

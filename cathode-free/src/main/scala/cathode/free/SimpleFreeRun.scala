@@ -15,7 +15,9 @@ import scala.concurrent.Future
 
 import cathode.arrow._
 
-object FreeRun {
+/** @author Andy Scott
+  */
+object SimpleFreeRun {
 
   def apply[S[_], A](
     system: ActorSystem, timeout: Timeout,
@@ -23,15 +25,15 @@ object FreeRun {
   ): Future[A] =
 
     AskFunctionK[Free[S, ?]](
-      system.actorOf(FreeRunActor.props[S](f)),
+      system.actorOf(SimpleFreeRunActor.props[S](f)),
       timeout).apply(free)
 
   def apply[S[_]]: ApplySyntax[S] = new ApplySyntax[S]
 
-  final class ApplySyntax[S[_]] private[FreeRun] {
+  final class ApplySyntax[S[_]] private[SimpleFreeRun] {
     def apply[A](
       system: ActorSystem, timeout: Timeout,
       free: Free[S, A], f: S ~> Future): Future[A] =
-      FreeRun[S, A](system, timeout, free, f)
+      SimpleFreeRun[S, A](system, timeout, free, f)
   }
 }

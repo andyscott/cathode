@@ -16,7 +16,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
-import scala.io.StdIn
+//import scala.io.StdIn
 
 import cathode.arrow._
 import cathode.free._
@@ -35,7 +35,8 @@ object IOOp {
     case Println(msg) ⇒ Future(println(msg()))
     case Readln(msg) ⇒ Future {
       println(msg())
-      StdIn.readLine()
+      //StdIn.readLine()
+      "foo"
     }
   }
 }
@@ -98,7 +99,7 @@ object FreerunDemo {
     val storageRef: ActorRef = system.actorOf(StorageActor.props)
     val interpreter = IOOp.interpreter or AskFunctionK[StorageActor.Op](storageRef, 10.seconds)
 
-    val res0 = FreeRun[Program](system, 100.seconds, program, interpreter)
+    val res0 = SimpleFreeRun[Program](system, 100.seconds, program, interpreter)
     val res1 = Await.result(res0, Duration.Inf)
 
     println("Result is " + res1)

@@ -35,7 +35,7 @@ class FunctionKSuite extends TestKit(ActorSystem())
     patienceConfig.timeout.length, patienceConfig.timeout.unit)
 
   def through[F[_]](f: F ~> Future)(implicit ec: ExecutionContext): F ~> Future = {
-    val ref = system.actorOf(Props(new FunctionKActor(f)))
+    val ref = system.actorOf(FunctionKActor.props(f))
     AskFunctionK(ref, timeout)
   }
 
@@ -46,7 +46,7 @@ class FunctionKSuite extends TestKit(ActorSystem())
 
   "round tripping an ADT ~> Future through Akka" should "behave the same as that ADT ~> Future" in {
     import FooADT._
-    roundtripConsistency[Foo](Foo.interp[Future])
+    roundtripConsistency(Foo.interp[Future])
   }
 
 }
