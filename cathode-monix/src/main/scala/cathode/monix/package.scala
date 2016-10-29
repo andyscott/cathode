@@ -4,4 +4,4 @@
 
 package cathode
 
-package object monix extends MonixSendInstances
+package object monix extends MonixSendableInstances
