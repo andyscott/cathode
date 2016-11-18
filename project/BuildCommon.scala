@@ -24,9 +24,9 @@ object BuildCommon extends AutoPlugin {
     AutomateHeaderPlugin.projectSettings
 
   private[this] def baseSettings = Seq(
-    scalaVersion := "2.11.8",
+    scalaVersion := "2.12.0",
 
-    organization := "com.47deg",
+    organization := "andyscott",
 
     fork in run := true,
     fork in Test := false,
@@ -45,7 +45,6 @@ object BuildCommon extends AutoPlugin {
       "-unchecked",
       //"-Xfatal-warnings",
       "-Xlint",
-      "-Yinline-warnings",
       "-Yno-adapted-args",
       "-Ywarn-dead-code",
       "-Ywarn-numeric-widen",
@@ -70,9 +69,7 @@ object BuildCommon extends AutoPlugin {
     libraryDependencies ++= Seq(
       // kind projector
       compilerPlugin(
-        "org.spire-math" %% "kind-projector" % "0.9.0" cross CrossVersion.binary),
-      // SI 2712 Fix
-      "com.milessabin" % "si2712fix-library" % "1.2.0" cross CrossVersion.full
+        "org.spire-math" %% "kind-projector" % "0.9.3" cross CrossVersion.binary)
     )
   )
 

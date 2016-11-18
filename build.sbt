@@ -1,11 +1,10 @@
-lazy val akkaVersion          = "2.4.9"
-lazy val catsVersion          = "0.7.2"
-lazy val monixVersion         = "2.0.0"
+lazy val akkaVersion          = "2.4.12"
+lazy val catsVersion          = "0.8.1"
+lazy val monixVersion         = "2.1.0"
 
 lazy val scalatestVersion     = "3.0.0"
-lazy val scalacheckVersion    = "1.13.2"
-lazy val disciplineVersion    = "0.4"
-lazy val catsScalatestVersion = "1.4.0"
+lazy val scalacheckVersion    = "1.13.4"
+lazy val disciplineVersion    = "0.7.2"
 lazy val gatlingVersion       = "2.2.2"
 
 lazy val root = (project in file("."))
