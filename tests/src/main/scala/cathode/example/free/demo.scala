@@ -9,14 +9,13 @@ package free
 import cats._
 import cats.data._
 import cats.free._
+import cats.syntax.flatMap._
 
 import akka.actor._
 
-import scala.concurrent.Await
+import scala.concurrent._
 import scala.concurrent.duration._
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
-//import scala.io.StdIn
+import scala.io.StdIn
 
 import cathode.arrow._
 import cathode.free._
@@ -35,8 +34,7 @@ object IOOp {
     case Println(msg) ⇒ Future(println(msg()))
     case Readln(msg) ⇒ Future {
       println(msg())
-      //StdIn.readLine()
-      "foo"
+      blocking { StdIn.readLine() }
     }
   }
 }
@@ -81,29 +79,47 @@ object FreerunDemo {
     val io = new IOOps[Program]
     val storage = new StorageOps[Program]
 
-    val program = for {
-      _ ← io.println("Hello!")
-      key1 ← io.readln("What key?")
-      value1 ← io.readln("What value?")
-      _ ← storage.set(key1, value1)
-      res1 ← storage.get(key1)
-      key2 ← io.readln("What key, again?")
-      res2 ← storage.get(key2).map(_ getOrElse "<<nada>>")
-      _ ← io.println(s"you looked up $res2")
-      _ ← io.println("thanks for playing")
+    def prompt: Free[Program, Unit] = for {
+      command ← io.readln("Enter a command (:help for help)").map(_.trim)
+      _ ← command match {
+        case ":quit" ⇒ quitCommand
+        case ":set"  ⇒ setCommand >> prompt
+        case ":get"  ⇒ getCommand >> prompt
+        case ":help" ⇒ helpCommand >> prompt
+        case _       ⇒ badCommand(command) >> prompt
+      }
+    } yield ()
 
-    } yield res2
+    def quitCommand: Free[Program, Unit] = io.println("See ya!")
+    def setCommand: Free[Program, Unit] = for {
+      key ← io.readln("What key?")
+      value ← io.readln("What value?")
+      _ ← storage.set(key, value)
+    } yield ()
+
+    def getCommand: Free[Program, Unit] = for {
+      key ← io.readln("What key?")
+      value ← storage.get(key).map(_ getOrElse "<<no value>>")
+      _ ← io.println(s"The value of $key is $value")
+    } yield ()
+
+    def helpCommand: Free[Program, Unit] = for {
+      _ ← io.println("Commands are:")
+      _ ← io.println("  :get, :set, :help, :quit")
+    } yield ()
+
+    def badCommand(command: String): Free[Program, Unit] = for {
+      _ ← io.println(s"Bad command $command")
+      _ ← helpCommand
+    } yield ()
+
+    val program = prompt
 
     val system = ActorSystem("cathode")
-
     val storageRef: ActorRef = system.actorOf(StorageActor.props)
     val interpreter = IOOp.interpreter or AskFunctionK[StorageActor.Op](storageRef, 10.seconds)
-
     val res0 = SimpleFreeRun[Program](system, 100.seconds, program, interpreter)
     val res1 = Await.result(res0, Duration.Inf)
-
-    println("Result is " + res1)
-
     val terminate = system.terminate()
   }
 
