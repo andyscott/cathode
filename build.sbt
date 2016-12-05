@@ -6,6 +6,7 @@ lazy val scalatestVersion     = "3.0.0"
 lazy val scalacheckVersion    = "1.13.4"
 lazy val disciplineVersion    = "0.7.2"
 lazy val gatlingVersion       = "2.2.2"
+lazy val scalacheckShapelessVersion = "1.1.3"
 
 lazy val root = (project in file("."))
   .aggregate(
@@ -44,7 +45,8 @@ lazy val `tests` = (project in file("tests"))
   .settings(libraryDependencies ++= Seq(
     "org.scalacheck"    %% "scalacheck"     % scalacheckVersion,
     "org.scalatest"     %% "scalatest"      % scalatestVersion,
-    "com.typesafe.akka" %% "akka-testkit"   % akkaVersion
+    "com.typesafe.akka" %% "akka-testkit"   % akkaVersion,
+    "com.github.alexarchambault" %% "scalacheck-shapeless_1.13" % scalacheckShapelessVersion
   ).map(_ % "test"))
   .enablePlugins(GatlingPlugin)
   .settings(libraryDependencies ++= Seq(
